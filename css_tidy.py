@@ -55,10 +55,13 @@ def tidy_string(input_css, script, args, shell=False):
     return tidied, err, p.returncode
 
 
-def get_csstidy_args(csstidy_args, passed_args):
+def get_csstidy_args(passed_args):
     '''Build command line arguments.'''
 
     settings = sublime.load_settings('CSSTidy.sublime-settings')
+
+    # Start off with a dash, the flag for using STDIN
+    csstidy_args = ['-']
 
     for option in supported_options:
         # The passed arguments override options in the settings file.
@@ -67,6 +70,7 @@ def get_csstidy_args(csstidy_args, passed_args):
         # If custom value isn't set, ignore that setting.
         if value is None:
             continue
+        # For some reason, csstidy.exe acts up less when passed numerals rather than booleans.
         if value in [True, 'true', 'True', 1]:
             value = '1'
         if value in [False, 'false', 'False', 0]:
@@ -133,8 +137,8 @@ class CssTidyCommand(sublime_plugin.TextCommand):
                 self.view.run_command('select_inside_tag')
             """
 
-        # Start off with a dash, the flag for using STDIN
-        csstidy_args = get_csstidy_args(['-'], args)
+        # Fetch arguments from prefs files.
+        csstidy_args = get_csstidy_args(args)
 
         # Optionally replace tabs with spaces.
         if self.view.settings().get('translate_tabs_to_spaces'):
@@ -142,9 +146,9 @@ class CssTidyCommand(sublime_plugin.TextCommand):
 
         out_file = normpath(join(packagepath, 'csstidy.tmp'))
         #print 'CSSTidy: setting out file to "{0}"'.format(out_file)
-
         csstidy_args.append(out_file)
 
+        # Tidy each selection.
         for sel in self.view.sel():
             tidied, err, retval = tidy_string(self.view.substr(sel), csstidy, csstidy_args, shell)
             if retval != 0:

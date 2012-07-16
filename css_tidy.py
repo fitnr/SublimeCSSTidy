@@ -56,7 +56,7 @@ def tidy_string(inputcss, script, args):
 
 
 def get_args(args):
-    'Build command line arguments.'
+    '''Build command line arguments.'''
 
     # load CSSTidy settings
     settings = sublime.load_settings('CSSTidy.sublime-settings')
@@ -79,22 +79,30 @@ def get_args(args):
 
 
 def fixup(string):
-    'Remove double newlines & decode text.'
+    '''Remove double newlines & decode text.'''
     return re.sub(r'\r\n|\r', '\n', string.decode('utf-8'))
+
+#################################### COMMAND ##################################
 
 
 class CSSTidyCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # Get current selection(s).
+        print 'CSSTidy: invoked on {0}'.format(self.view.file_name())
+
         if self.view.sel()[0].empty():
             # If no selection, get the entire view.
             self.view.sel().add(sublime.Region(0, self.view.size()))
+
+            """
             # If selection, then make sure not to add body tags and the like.
             # Not sure how to bring this into st2, or if it ever worked.
-            #if self.view.match_selector(0, 'source.css.embedded.html'):
-            #    self.view.run_command('select_inside_tag')
 
-        # Start off with a dash, flag for using STDIN
+            if self.view.match_selector(0, 'source.css.embedded.html'):
+                self.view.run_command('select_inside_tag')
+            """
+
+        # Start off with a dash, the flag for using STDIN
         args = get_args(['-'])
 
         out_file = normpath(join(packagepath, 'csstidy.tmp'))
@@ -103,9 +111,9 @@ class CSSTidyCommand(sublime_plugin.TextCommand):
 
         for sel in self.view.sel():
             tidied, err, retval = tidy_string(self.view.substr(sel), csstidy, args)
-
+            print 'CSSTidy: retval: ' + retval
         if err:
-            print "CSSTidy experienced an error. Opening up a new file to show you."
+            print "CSSTidy experienced an error. Opening up a new file to show it to you."
             # Again, adapted from the Sublime Text 1 webdevelopment package
             nv = self.view.window().new_file()
             nv.set_scratch(1)

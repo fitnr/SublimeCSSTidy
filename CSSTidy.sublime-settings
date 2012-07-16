@@ -30,25 +30,26 @@
 	//"case_properties": "0",
 
 	// false or true
-	//"sort_selectors": false,
+	//"sort_selectors": "false",
 
 	// true or false
-	//"compress_colors": true,
+	//"compress_colors": "true",
 
 	// false or true
-	//"lowercase_s": false,
+	//"lowercase_s": "false",
 
 	// false or true
-	"preserve_css": true,
+	"preserve_css": "true",
 
 	// false or true
-	"sort_properties": true,
+	"sort_properties": "false",
 
 	// "2", "1", "0"
 	"merge_selectors": "0",
 
 	// default, filename, low, high, highest
 	// if 'filename', looks for file in packages/user
-	"template": "custom.tpl"
+	"template": "default"
+	//"template": "csstidy-custom.tpl"
 
 }

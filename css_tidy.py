@@ -88,7 +88,7 @@ csstidy = normpath(join(packagepath, 'win', 'csstidy.exe'))
 class CssTidyCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
         # Get current selection(s).
-        print 'CSSTidy: invoked on {0} with args: {1}'.format(self.view.file_name(), args)
+        print 'CSSTidy: tidying {0} with args: {1}'.format(self.view.file_name(), args)
 
         if sublime.platform() == 'windows':
             shell = False
@@ -115,13 +115,14 @@ class CssTidyCommand(sublime_plugin.TextCommand):
             space_tab = " " * int(self.view.settings().get('tab_size', 4))
 
         out_file = normpath(join(packagepath, 'csstidy.tmp'))
-        print 'CSSTidy: setting out file to "{0}"'.format(out_file)
+        #print 'CSSTidy: setting out file to "{0}"'.format(out_file)
 
         csstidy_args.append(out_file)
 
         for sel in self.view.sel():
             tidied, err, retval = tidy_string(self.view.substr(sel), csstidy, csstidy_args, shell)
-            print 'CSSTidy returned {0}'.format(retval)
+            if retval != 0:
+                print 'CSSTidy returned {0}'.format(retval)
 
         if err or retval != 0:
             print "CSSTidy experienced an error. Opening up a new window to show you."

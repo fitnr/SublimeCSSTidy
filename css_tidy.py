@@ -35,7 +35,7 @@ supported_options = [
 
 
 packagepath = normpath(join(sublime.packages_path(), 'CSStidy'))
-csstidy = normpath(join(packagepath, 'win', 'csstidy.exe'))
+csstidypath = normpath(join(packagepath, 'win', 'csstidy.exe'))
 scriptpath = normpath(join(packagepath, 'csstidy.php'))
 
 #################################### FUNCTIONS #################################
@@ -87,9 +87,9 @@ def find_tidier():
 
     if sublime.platform() == 'windows':
         try:
-            subprocess.call([csstidy, "-v"])
-            print "CSSTidy: using Tidy found here: " + csstidy
-            return csstidy
+            subprocess.call([csstidypath, "-v"])
+            print "CSSTidy: using Tidy found here: " + csstidypath
+            return csstidypath
         except OSError:
             print "CSSTidy: Didn't find tidy.exe in " + packagepath
             pass
@@ -113,10 +113,13 @@ class CssTidyCommand(sublime_plugin.TextCommand):
         # Get current selection(s).
         print 'CSSTidy: tidying {0} with args: {1}'.format(self.view.file_name(), args)
 
-        if sublime.platform() == 'windows':
-            shell = False
-        else:
-            shell = True
+        try:
+            csstidy = find_tidier()
+        except OSError:
+            print "CSSTidy: Couldn't find CSSTidy.exe or PHP. Stopping without Tidying anything."
+            return
+
+        shell = False if 'windows' == sublime.platform() else True
 
         if self.view.sel()[0].empty():
             # If no selection, get the entire view.

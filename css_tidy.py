@@ -44,25 +44,26 @@ supported_options = [
 
 def tidy_string(inputcss, script, args):
     command = [script] + args
+    print "CSSTidy: Sending this to the command line: {0}".format(" ".join(command))
     p = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         stdin=subprocess.PIPE,
-        shell=True
+        shell=False
         )
     tidied, err = p.communicate(inputcss)
     return tidied, err, p.returncode
 
 
-def get_args(args):
+def get_csstidy_args(csstidy_args, passed_args):
     '''Build command line arguments.'''
 
-    # load CSSTidy settings
     settings = sublime.load_settings('CSSTidy.sublime-settings')
 
     for option in supported_options:
-        value = settings.get(option)
+        # The passed arguments override options in the settings file.
+        value = settings.get(option) if passed_args.get(option) is None else passed_args.get(option)
 
         # If custom value isn't set, ignore that setting.
         if value is None:
@@ -72,10 +73,19 @@ def get_args(args):
         if value == False:
             value = '0'
 
-        # print "CSSTidy: setting " + option + ": " + value
-        args.extend(["--" + option, str(value)])
+        if 'template' == option and value not in ['default', 'low', 'high', 'highest']:
+            value = normjoin(sublime.packages_path(), 'User', value)
 
-    return args
+        print 'CSSTidy: setting "{0}" to "{1}"'.format(option, value)
+        csstidy_args.append("--" + option)
+        csstidy_args.append(str(value))
+    print csstidy_args
+
+    return csstidy_args
+
+
+def normjoin(*a):
+    return normpath(join(*a))
 
 
 def fixup(string):
@@ -85,10 +95,10 @@ def fixup(string):
 #################################### COMMAND ##################################
 
 
-class CSSTidyCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+class CssTidyCommand(sublime_plugin.TextCommand):
+    def run(self, edit, **args):
         # Get current selection(s).
-        print 'CSSTidy: invoked on {0}'.format(self.view.file_name())
+        print 'CSSTidy: invoked on {0} with args: {1}'.format(self.view.file_name(), args)
 
         if self.view.sel()[0].empty():
             # If no selection, get the entire view.
@@ -103,17 +113,18 @@ class CSSTidyCommand(sublime_plugin.TextCommand):
             """
 
         # Start off with a dash, the flag for using STDIN
-        args = get_args(['-'])
+        csstidy_args = get_csstidy_args(['-'], args)
 
-        out_file = normpath(join(packagepath, 'csstidy.tmp'))
+        out_file = normjoin(packagepath, 'csstidy.tmp')
+        print 'CSSTidy: setting out file to "{0}"'.format(out_file)
 
-        args.extend(out_file)
+        csstidy_args.append(out_file)
 
         for sel in self.view.sel():
-            tidied, err, retval = tidy_string(self.view.substr(sel), csstidy, args)
-            print 'CSSTidy: retval: ' + retval
+            tidied, err, retval = tidy_string(self.view.substr(sel), csstidy, csstidy_args)
+            print 'CSSTidy: retval: {0}'.format(retval)
         if err:
-            print "CSSTidy experienced an error. Opening up a new file to show it to you."
+            print "CSSTidy experienced an error. Opening up a new window to show you."
             # Again, adapted from the Sublime Text 1 webdevelopment package
             nv = self.view.window().new_file()
             nv.set_scratch(1)
@@ -123,7 +134,7 @@ class CSSTidyCommand(sublime_plugin.TextCommand):
             nv.set_name('CSSTidy Errors')
 
         else:
-            with open(out_file, "w+") as fh:
+            with open(out_file, "r") as fh:
                 tidied = fh.read().rstrip()
                 # Todo: do we need to run fixup in tidied?
-                self.view.replace(tidied, sel, tidied)
+                self.view.replace(edit, sel, tidied)

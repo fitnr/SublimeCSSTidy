@@ -49,7 +49,7 @@
 
 	// default, filename, low, high, highest
 	// if 'filename', looks for file in packages/user
-	"template": "default"
-	//"template": "csstidy-custom.tpl"
+	//"template": "default"
+	"template": "csstidy-custom.tpl"
 
 }

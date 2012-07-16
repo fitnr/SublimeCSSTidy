@@ -12,7 +12,7 @@ import subprocess
 import sublime
 import sublime_plugin
 
-#################################### OPTIONS ###################################
+################################### CONSTANTS ##################################
 
 supported_options = [
     "allow_html_in_templates",
@@ -32,6 +32,11 @@ supported_options = [
     "optimise_shorthands",
     "template"
 ]
+
+
+packagepath = normpath(join(sublime.packages_path(), 'CSStidy'))
+csstidy = normpath(join(packagepath, 'win', 'csstidy.exe'))
+scriptpath = normpath(join(packagepath, 'csstidy.php'))
 
 #################################### FUNCTIONS #################################
 
@@ -68,7 +73,7 @@ def get_csstidy_args(csstidy_args, passed_args):
             value = '0'
 
         if 'template' == option and value not in ['default', 'low', 'high', 'highest', 'lowest']:
-            value = '"' + normpath(join(sublime.packages_path(), 'User', value)) + '"'
+            value = normpath(join(sublime.packages_path(), 'User', value))
 
         #print 'CSSTidy: setting --{0}={1}'.format(option, value)
         arg = "--{0}={1}".format(option, value)
@@ -77,10 +82,28 @@ def get_csstidy_args(csstidy_args, passed_args):
     return csstidy_args
 
 
-################################### CONSTANTS ##################################
+def find_tidier():
+    ' Try bundled tidy (if windows), then php.'
 
-packagepath = normpath(join(sublime.packages_path(), 'CSStidy'))
-csstidy = normpath(join(packagepath, 'win', 'csstidy.exe'))
+    if sublime.platform() == 'windows':
+        try:
+            subprocess.call([csstidy, "-v"])
+            print "CSSTidy: using Tidy found here: " + csstidy
+            return csstidy
+        except OSError:
+            print "CSSTidy: Didn't find tidy.exe in " + packagepath
+            pass
+
+    try:
+        subprocess.call(['php', '-v'])
+        print "CSSTidy: Using PHP CSSTidy module."
+        return 'php ' + normpath(scriptpath)
+    except OSError:
+        print "CSSTidy: Couldn't find PHP, can't tidy!"
+        pass
+
+    raise OSError
+
 
 #################################### COMMAND ##################################
 

@@ -76,10 +76,9 @@ def get_csstidy_args(csstidy_args, passed_args):
         if 'template' == option and value not in ['default', 'low', 'high', 'highest']:
             value = normjoin(sublime.packages_path(), 'User', value)
 
-        print 'CSSTidy: setting "{0}" to "{1}"'.format(option, value)
-        csstidy_args.append("--" + option)
-        csstidy_args.append(str(value))
-    print csstidy_args
+        #print 'CSSTidy: setting --{0}={1}'.format(option, value)
+        arg = "--{0}={1}".format(option, value)
+        csstidy_args.append(arg)
 
     return csstidy_args
 
@@ -87,10 +86,6 @@ def get_csstidy_args(csstidy_args, passed_args):
 def normjoin(*a):
     return normpath(join(*a))
 
-
-def fixup(string):
-    '''Remove double newlines & decode text.'''
-    return re.sub(r'\r\n|\r', '\n', string.decode('utf-8'))
 
 #################################### COMMAND ##################################
 
@@ -122,7 +117,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
 
         for sel in self.view.sel():
             tidied, err, retval = tidy_string(self.view.substr(sel), csstidy, csstidy_args)
-            print 'CSSTidy: retval: {0}'.format(retval)
+            print 'CSSTidy returned {0}'.format(retval)
         if err:
             print "CSSTidy experienced an error. Opening up a new window to show you."
             # Again, adapted from the Sublime Text 1 webdevelopment package
@@ -136,5 +131,5 @@ class CssTidyCommand(sublime_plugin.TextCommand):
         else:
             with open(out_file, "r") as fh:
                 tidied = fh.read().rstrip()
-                # Todo: do we need to run fixup in tidied?
-                self.view.replace(edit, sel, tidied)
+                # Add newline at end of tidied result.
+                self.view.replace(edit, sel, tidied + "\n")

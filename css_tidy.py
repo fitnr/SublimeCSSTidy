@@ -7,6 +7,7 @@
 from __future__ import with_statement
 from os.path import join, normpath
 import subprocess
+import re
 
 # Sublime Libs
 import sublime
@@ -77,6 +78,11 @@ def get_args(args):
     return args
 
 
+def fixup(string):
+    'Remove double newlines & decode text.'
+    return re.sub(r'\r\n|\r', '\n', string.decode('utf-8'))
+
+
 class CSSTidyCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # Get current selection(s).
@@ -91,6 +97,10 @@ class CSSTidyCommand(sublime_plugin.TextCommand):
         # Start off with a dash, flag for using STDIN
         args = get_args(['-'])
 
+        out_file = normpath(join(packagepath, 'csstidy.tmp'))
+
+        args.extend(out_file)
+
         for sel in self.view.sel():
             tidied, err, retval = tidy_string(self.view.substr(sel), csstidy, args)
 
@@ -103,3 +113,9 @@ class CSSTidyCommand(sublime_plugin.TextCommand):
             command = csstidy + " " + " ".join(x for x in args)
             nv.insert(edit, 0, err + "\n" + command)
             nv.set_name('CSSTidy Errors')
+
+        else:
+            with open(out_file, "w+") as fh:
+                tidied = fh.read().rstrip()
+                # Todo: do we need to run fixup in tidied?
+                self.view.replace(tidied, sel, tidied)

@@ -3,7 +3,6 @@
 # adapted from csstidy.py in the Sublime Text 1 webdevelopment package
 #################################### IMPORTS ###################################
 
-# Std Libs
 from __future__ import with_statement
 from os.path import join, normpath
 import subprocess
@@ -32,7 +31,6 @@ supported_options = [
     "optimise_shorthands",
     "template"
 ]
-
 
 packagepath = normpath(join(sublime.packages_path(), 'CSStidy'))
 csstidypath = normpath(join(packagepath, 'win', 'csstidy.exe'))
@@ -92,7 +90,7 @@ def find_tidier():
     if sublime.platform() == 'windows':
         try:
             subprocess.call([csstidypath, "-v"])
-            print "CSSTidy: using Tidy found here: " + csstidypath
+            #print "CSSTidy: using Tidy found here: " + csstidypath
             return csstidypath
         except OSError:
             print "CSSTidy: Didn't find tidy.exe in " + packagepath
@@ -100,7 +98,7 @@ def find_tidier():
 
     try:
         subprocess.call(['php', '-v'])
-        print "CSSTidy: Using PHP CSSTidy module."
+        #print "CSSTidy: Using PHP CSSTidy module."
         return 'php ' + normpath(scriptpath)
     except OSError:
         print "CSSTidy: Couldn't find PHP, can't tidy!"

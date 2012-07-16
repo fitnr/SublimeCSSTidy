@@ -30,11 +30,14 @@ $long_options = array(
 $args = getopt("", $long_options);
 
 var_dump($GLOBALS['argv']);
-var_dump$args);
+var_dump($args);
+
+// Create tidier
+
+$css = new csstidy();
 
 // Set config options
 
-$css = new csstidy();
 for ($option in $long_options):
 
   if isset($args[$option]):
@@ -49,11 +52,10 @@ $css->parse(STDIN);
 fwrite(STDOUT, $css->print->formatted());
 
 /*
-
 // Is there an error handler in csstidy.php? who knows?
 
 if ( SOME_KIND_OF_ERROR_OPTION ) {
-    fwrite( STDERR, $tidy->errorBuffer );
+    fwrite(STDERR, $css->errors);
 }
 */
 

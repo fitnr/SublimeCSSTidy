@@ -40,7 +40,7 @@
 
   // default, filename, low, high, highest, template_string
   // if 'filename', looks for in the User folder of the packages directory
-  // A sample file (custom.tpl) is in the csstidy package folder.
+  // A sample file (medium-template.txt) is in the csstidy package folder.
   // More info on templates: http://csstidy.sourceforge.net/templates.php
   "template": "default",
 

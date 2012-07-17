@@ -40,7 +40,7 @@
 
   // default, filename, low, high, highest
   // if 'filename', looks for file in packages/user
-  //"template": "default"
+  "template": "default",
 
   // false or true
   "preserve_css": "true",

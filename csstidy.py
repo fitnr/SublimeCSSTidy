@@ -41,25 +41,26 @@ scriptpath = normpath(join(packagepath, 'csstidy.php'))
 
 def tidy_string(input_css, script, args, shell=False):
     command = [script] + args
-    print "CSSTidy: Sending this to the command line: {0}".format(" ".join(command))
+    print "CSSTidy: Sending command: {0}".format(" ".join(command))
     p = subprocess.Popen(
         command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
         stdin=subprocess.PIPE,
-        shell=shell
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE  # ,
+        #shell=shell
         )
     tidied, err = p.communicate(input_css)
     return tidied, err, p.returncode
 
 
-def get_csstidy_args(passed_args):
+def get_csstidy_args(passed_args, php_flag):
     '''Build command line arguments.'''
 
     settings = sublime.load_settings('CSSTidy.sublime-settings')
 
     # Start off with a dash, the flag for using STDIN
-    csstidy_args = ['-']
+    if not php_flag:
+        csstidy_args = ['-']
 
     for option in supported_options:
         # The passed arguments override options in the settings file.
@@ -78,8 +79,11 @@ def get_csstidy_args(passed_args):
             value = normpath(join(sublime.packages_path(), 'User', value))
 
         #print 'CSSTidy: setting --{0}={1}'.format(option, value)
-        arg = "--{0}={1}".format(option, value)
-        csstidy_args.append(arg)
+        if php_flag:
+            arg = ['--' + option, value]
+        else:
+            arg = ["--{0}={1}".format(option, value)]
+        csstidy_args.extend(arg)
 
     return csstidy_args
 
@@ -91,7 +95,8 @@ def find_tidier():
         try:
             subprocess.call([csstidypath, "-v"])
             #print "CSSTidy: using Tidy found here: " + csstidypath
-            return csstidypath
+            php_flag = False
+            return csstidypath, php_flag
         except OSError:
             print "CSSTidy: Didn't find tidy.exe in " + packagepath
             pass
@@ -99,7 +104,8 @@ def find_tidier():
     try:
         subprocess.call(['php', '-v'])
         #print "CSSTidy: Using PHP CSSTidy module."
-        return 'php ' + normpath(scriptpath)
+        php_flag = True
+        return 'php -f "' + normpath(scriptpath) + '"', php_flag
     except OSError:
         print "CSSTidy: Couldn't find PHP, can't tidy!"
         pass
@@ -116,12 +122,12 @@ class CssTidyCommand(sublime_plugin.TextCommand):
         print 'CSSTidy: tidying {0} with args: {1}'.format(self.view.file_name(), args)
 
         try:
-            csstidy = find_tidier()
+            csstidy, php_flag = find_tidier()
         except OSError:
             print "CSSTidy: Couldn't find CSSTidy.exe or PHP. Stopping without Tidying anything."
             return
 
-        shell = False if 'windows' == sublime.platform() else True
+        shell = False  # if 'windows' == sublime.platform() else False
 
         if self.view.sel()[0].empty():
             # If no selection, get the entire view.
@@ -136,19 +142,23 @@ class CssTidyCommand(sublime_plugin.TextCommand):
             """
 
         # Fetch arguments from prefs files.
-        csstidy_args = get_csstidy_args(args)
+        csstidy_args = get_csstidy_args(args, php_flag)
 
         # Optionally replace tabs with spaces.
         if self.view.settings().get('translate_tabs_to_spaces'):
             space_tab = " " * int(self.view.settings().get('tab_size', 4))
 
-        out_file = normpath(join(packagepath, 'csstidy.tmp'))
+        if 'osx' == sublime.platform():
+            out_file = normpath('~/Shared/csstidy.tmp')
+        else:
+            out_file = normpath(join(packagepath, 'csstidy.tmp'))
         #print 'CSSTidy: setting out file to "{0}"'.format(out_file)
-        csstidy_args.append(out_file)
+        #csstidy_args.append(out_file)
 
         # Tidy each selection.
         for sel in self.view.sel():
             tidied, err, retval = tidy_string(self.view.substr(sel), csstidy, csstidy_args, shell)
+            print tidied
             if retval != 0:
                 print 'CSSTidy returned {0}'.format(retval)
 
@@ -163,7 +173,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
             nv.set_name('CSSTidy Errors')
 
         else:
-            with open(out_file, "r") as fh:
+            with open(out_file, "r+") as fh:
                 tidied = fh.read().rstrip()
                 if self.view.settings().get('translate_tabs_to_spaces'):
                     tidied.replace("\t", space_tab)

@@ -79,7 +79,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
         try:
             csstidy, using_php = find_tidier()
         except OSError:
-            print "CSSTidy: Couldn't find CSSTidy.exe or PHP. Stopping without Tidying anything."
+            print "CSSTidy: Couldn't find csstidy.exe or PHP. Stopping without Tidying anything."
             return
 
         if self.view.sel()[0].empty():
@@ -95,7 +95,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
             """
 
         # Fetch arguments from prefs files.
-        csstidy_args = self.get_csstidy_args(args, using_php)
+        csstidy_args = self.get_args(args, using_php)
 
         # Tidy each selection.
         for sel in self.view.sel():
@@ -104,7 +104,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
 
             if err or retval != 0:
                 print 'CSSTidy returned {0}'.format(retval)
-                print "CSSTidy experienced an error. Opening up a new window to show you."
+                print "CSSTidy experienced an error. Opening up a new window to show you more."
                 # Again, adapted from the Sublime Text 1 webdevelopment package
                 nv = self.view.window().new_file()
                 nv.set_scratch(1)
@@ -125,11 +125,10 @@ class CssTidyCommand(sublime_plugin.TextCommand):
                 self.view.replace(edit, sel, tidied + "\n")
                 return
 
-    def get_csstidy_args(self, passed_args, using_php):
+    def get_args(self, passed_args, using_php):
         '''Build command line arguments.'''
 
         settings = sublime.load_settings('csstidy.sublime-settings')
-
         csstidy_args = []
 
         # Start off with a dash, the flag for using STDIN
@@ -156,6 +155,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
                 value = normpath(join(sublime.packages_path(), 'User', value))
 
             # php.osx gets different argument formats.
+            # TODO: check on this.
             if using_php and 'osx' == sublime.platform():
                 csstidy_args.extend(['--' + option, value])
             else:

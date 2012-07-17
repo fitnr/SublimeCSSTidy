@@ -1,17 +1,12 @@
 #!/usr/bin/env python
 #coding: utf8
 # adapted from csstidy.py in the Sublime Text 1 webdevelopment package
-#################################### IMPORTS ###################################
-
-from __future__ import with_statement
 from os.path import join, normpath
 import subprocess
-
-# Sublime Libs
 import sublime
 import sublime_plugin
 
-################################### CONSTANTS ##################################
+### CONSTANTS ###
 
 supported_options = [
     "allow_html_in_templates",
@@ -31,12 +26,11 @@ supported_options = [
     "optimise_shorthands",
     "template"
 ]
-
 packagepath = normpath(join(sublime.packages_path(), 'CSStidy'))
 csstidypath = normpath(join(packagepath, 'win', 'csstidy.exe'))
 scriptpath = normpath(join(packagepath, 'csstidy.php'))
 
-#################################### FUNCTIONS #################################
+### FUNCTIONS ###
 
 
 def tidy_string(input_css, script, args):
@@ -53,29 +47,28 @@ def tidy_string(input_css, script, args):
 
 
 def find_tidier():
-    ' Try bundled tidy (if windows), then php.'
-
-    if sublime.platform() == 'windows':
-        try:
-            subprocess.call([csstidypath, "-v"])
-            #print "CSSTidy: using Tidy found here: " + csstidypath
-            return csstidypath, False
-        except OSError:
-            print "CSSTidy: Didn't find tidy.exe in " + packagepath
-            pass
+    ' Try php, then bundled tidy (if windows)'
 
     try:
         subprocess.call(['php', '-v'])
         #print "CSSTidy: Using PHP CSSTidy module."
         return 'php', True
     except OSError:
-        print "CSSTidy can't find PHP. Is it installed and in you PATH?"
+        print "CSSTidy: PHP not found. Is it installed and in your PATH?"
         pass
+
+    if sublime.platform() == 'windows':
+        try:
+            subprocess.call([csstidypath, "-v"])
+            print "CSSTidy: using csstidy.exe"
+            return csstidypath, False
+        except OSError:
+            print "CSSTidy: Didn't find tidy.exe in " + packagepath
+            pass
 
     raise OSError
 
-
-#################################### COMMAND ##################################
+### COMMAND ##
 
 
 class CssTidyCommand(sublime_plugin.TextCommand):
@@ -146,35 +139,36 @@ class CssTidyCommand(sublime_plugin.TextCommand):
             csstidy_args.extend(['-f', normpath(scriptpath), '--'])
 
         for option in supported_options:
-            # The passed arguments override options in the settings file.
-            value = settings.get(option) if passed_args.get(option) is None else passed_args.get(option)
-
             # If custom value isn't set, ignore that setting.
-            if value is None:
+            if settings.get(option) is None and passed_args.get(option) is None:
                 continue
+
+            # The passed arguments override options in the settings file.
+            value = passed_args.get(option) if passed_args.get(option) is not None else settings.get(option)
+
             # For some reason, csstidy.exe acts up less when passed numerals rather than booleans.
             if value in [True, 'true', 'True', 1]:
                 value = '1'
             if value in [False, 'false', 'False', 0]:
                 value = '0'
 
-            if 'template' == option and value not in ['default', 'low', 'high', 'highest', 'lowest']:
+            if 'template' == option and value not in ['default', 'low', 'high', 'highest']:
                 value = normpath(join(sublime.packages_path(), 'User', value))
 
-            #print 'CSSTidy: setting --{0}={1}'.format(option, value)
+            # php and csstidy.exe get different argument formats. csstidy.exe is cranky!
             if using_php:
-                arg = ['--' + option, value]
+                csstidy_args.extend(['--' + option, value])
             else:
-                arg = ["--{0}={1}".format(option, value)]
-            csstidy_args.extend(arg)
+                csstidy_args.append("--{0}={1}".format(option, value))
 
         # Optionally replace tabs with spaces.
         if self.view.settings().get('translate_tabs_to_spaces'):
             self.space_tab = " " * int(self.view.settings().get('tab_size', 4))
 
+        # Set out file for csstidy.exe. PHP using stream.
         if not using_php:
             self.out_file = normpath(join(packagepath, 'csstidy.tmp'))
-            print 'CSSTidy: setting out file to "{0}"'.format(self.out_file)
             csstidy_args.append(self.out_file)
+            #print 'CSSTidy: setting temp file to "{0}"'.format(self.out_file)
 
         return csstidy_args

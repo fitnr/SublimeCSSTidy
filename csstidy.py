@@ -128,7 +128,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
     def get_csstidy_args(self, passed_args, using_php):
         '''Build command line arguments.'''
 
-        settings = sublime.load_settings('CSSTidy.sublime-settings')
+        settings = sublime.load_settings('csstidy.sublime-settings')
 
         csstidy_args = []
 

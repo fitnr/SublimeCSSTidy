@@ -64,9 +64,8 @@ foreach ($long_options as $option):
   endif;
 endforeach;
 
-// read and write from pipe
+// read from pipe, parse, write to pipe
 $input = stream_get_contents(STDIN);
-
 $css->parse($input);
 fwrite(STDOUT, $css->print->plain());
 

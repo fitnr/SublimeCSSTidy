@@ -72,6 +72,7 @@ def find_tidier():
         return 'php', True
     except OSError:
         print "CSSTidy: Couldn't find PHP, can't tidy!"
+        print "CSSTidy: Make sure that PHP is in your PATH."
         pass
 
     raise OSError

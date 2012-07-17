@@ -20,8 +20,7 @@ $long_options = array(
   "merge_selectors::",
   "case_properties::",
   "optimise_shorthands::",
-  "template::",
-  "output_filename::"
+  "template::"
 );
 
 // Get arguments. Dummy for short options

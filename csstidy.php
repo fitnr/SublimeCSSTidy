@@ -48,8 +48,15 @@ if (isset($args['template'])):
         break;
        
        default:
-        if (file_exists($args['template'])):
+        # If 'template' contains a pipe, it's a template string
+        if (strpos($args['template'], '|') !== false):
+          $css->load_template($args['template'], false);   
+
+        # If 'template' is a file, it's a file location
+        elseif (file_exists($args['template'])):
           $css->load_template($args['template'], true);
+
+        # Otherwise, use the default template
         else:
           $css->load_template('default');
         endif;

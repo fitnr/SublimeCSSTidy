@@ -1,7 +1,0 @@
-[
-    { "caption": "Tidy CSS", "command": "css_tidy" },
-    { "caption": "Tidy CSS (High Compression)", "command": "css_tidy", "args": {"template": "high" } },
-    { "caption": "Tidy CSS (Low Compression)", "command": "css_tidy", "args": {"template": "low" } }
-
-
-]

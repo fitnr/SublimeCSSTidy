@@ -1,5 +1,5 @@
 #!/usr/bin/php
-<?php 
+<?php
 // Includes
 include 'csstidyphp/class.csstidy.php' ;
 

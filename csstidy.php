@@ -70,11 +70,9 @@ $css->parse($input);
 fwrite(STDOUT, $css->print->plain());
 
 /*
-// Is there an error handler in csstidy.php? who knows?
-
+// Is there an error handler in csstidyphp? I don't think so?
 if ( SOME_KIND_OF_ERROR_OPTION ) {
-    fwrite(STDERR, $css->errors);
+    fwrite(STDERR, $css->ERRORS);
 }
 */
-
 ?>

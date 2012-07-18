@@ -6,16 +6,16 @@ SublimeCSSTidy is a [Sublime Text 2](http://www.sublimetext.com/2) package for c
 
 SublimeCSSTidy adds three commands to the Sublime Text 2 command palette:
 
-*Tidy CSS (Highest Compression)
-*Tidy CSS (Low Compression)
-*Tidy CSS
+* Tidy CSS (Highest Compression)
+* Tidy CSS (Low Compression)
+* Tidy CSS
 
-The last one uses the default template, which is a decent balance of readability and compression . If you can decipher the complicated patten for creating [custom formatting rules](http://csstidy.sourceforge.net/templates.php), SublimeCSSTidy will happily use them. An example of a custom template file is included (`template-medium.txt`).
+The last one uses the default template, which is a decent balance of readability and compression. If you can decipher the complicated pattern for creating [custom formatting rules](http://csstidy.sourceforge.net/templates.php), SublimeCSSTidy will happily use them. An example of a custom template file is included (`template-medium.txt`).
 
 ### Installation
 
 #### With Package Control
-If you have [Package Control][package_control] installed, you can install CSSTIdy from within Sublime Text 2. Open the Command Palette and select "Package Control: Install Package", then search for `CSSTidy`.
+If you have [Package Control][package_control] installed, you can install CSSTIdy from within Sublime Text 2. Open the Command Palette and select "Package Control: Install Package", then search for *CSSTidy*.
 
 #### Without Package Control
 Go to your Sublime Text 2 Packages directory (by selecting "Preferences > Browse Packages") and clone the repository there:

@@ -154,12 +154,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
             if 'template' == option and value not in ['default', 'low', 'high', 'highest']:
                 value = normpath(join(sublime.packages_path(), 'User', value))
 
-            # php.osx gets different argument formats.
-            # TODO: check on this.
-            if using_php and 'osx' == sublime.platform():
-                csstidy_args.extend(['--' + option, value])
-            else:
-                csstidy_args.append("--{0}={1}".format(option, value))
+            csstidy_args.append("--{0}={1}".format(option, value))
 
         # Optionally replace tabs with spaces.
         if self.view.settings().get('translate_tabs_to_spaces'):

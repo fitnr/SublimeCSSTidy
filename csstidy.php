@@ -3,7 +3,7 @@
 // Includes
 include 'csstidyphp/class.csstidy.php' ;
 
-// Options
+// Get arguments. Dummy for short options
 $long_options = array(
   "allow_html_in_templates::",
   "compress_colors::",
@@ -22,8 +22,6 @@ $long_options = array(
   "optimise_shorthands::",
   "template::"
 );
-
-// Get arguments. Dummy for short options
 $args = getopt("nyc", $long_options);
 
 // Create tidier
@@ -59,6 +57,8 @@ endif;
 
 // Set config options
 foreach ($long_options as $option):
+  // Important line: make sure PHP recognizes option name
+  $option = trim($option, ":");
   if (isset($args[$option]) and $option != 'template'):
       $css->set_cfg($option, $args[$option]);
   endif;

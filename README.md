@@ -2,7 +2,7 @@
 ## CSS code formatter for Sublime Text 2
 
 ### What is does
-SublimeCSSTidy is a [Sublime Text 2](http://www.sublimetext.com/2) package for cleaning and tidying up your CSS 2. It doesn't work as well with CSS 3, but it won't break anything. It's mostly a wrapper for the [CSS Tidy PHP Library](http://github.com/Cerdic/CSSTidy), but it will fall back on a bundled [CSS Tidy](http://csstidy.sourceforge.net/) executable for Windows users without PHP.
+SublimeCSSTidy is a [Sublime Text 2](http://www.sublimetext.com/2) package for cleaning and tidying up your CSS. It's mostly a wrapper for the [CSS Tidy PHP Library](http://github.com/Cerdic/CSSTidy), but it will fall back on a bundled [CSS Tidy](http://csstidy.sourceforge.net/) executable for Windows users without PHP (the exe isn't recommended for CSS3, take care).
 
 SublimeCSSTidy adds three commands to the Sublime Text 2 command palette:
 
@@ -20,7 +20,7 @@ If you have [Package Control][package_control] installed, you can install CSSTId
 #### Without Package Control
 Go to your Sublime Text 2 Packages directory (by selecting "Preferences > Browse Packages") and clone the repository there:
 
-    git clone git://github.com/netpro2k/SublimeBlockCursor
+    git clone git://github.com/fitnr/SublimeCSSTidy
 
 ### Configuration
 Check out `csstidy.sublime-settings` for a documented list of options.

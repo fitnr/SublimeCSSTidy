@@ -18,9 +18,12 @@ The last one uses the default template, which is a decent balance of readability
 If you have [Package Control][package_control] installed, you can install CSSTIdy from within Sublime Text 2. Open the Command Palette and select "Package Control: Install Package", then search for *CSSTidy*.
 
 #### Without Package Control
-Go to your Sublime Text 2 Packages directory (by selecting "Preferences > Browse Packages") and clone the repository there:
+Go to your Sublime Text 2 packages directory (by selecting "Preferences > Browse Packages") and clone the repository there:
 
     git clone git://github.com/fitnr/SublimeCSSTidy
+
+#### Without Package Control or Git
+[Go to the download section](http://github.com/fitnr/SublimeCSSTidy/downloads) and download the package. Unzip it and move the CSSTidy folder into your Sublime Text 2 packages directory.
 
 ### Configuration
 Check out `csstidy.sublime-settings` for a documented list of options.

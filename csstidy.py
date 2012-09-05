@@ -26,7 +26,7 @@ supported_options = [
     "optimise_shorthands",
     "template"
 ]
-packagepath = normpath(join(sublime.packages_path(), 'CSStidy'))
+packagepath = normpath(join(sublime.packages_path(), 'CSSTidy'))
 csstidypath = normpath(join(packagepath, 'win', 'csstidy.exe'))
 scriptpath = normpath(join(packagepath, 'csstidy.php'))
 

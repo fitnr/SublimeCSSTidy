@@ -18,7 +18,7 @@ Check out `csstidy.sublime-settings` for a documented list of options.
 ### Installation
 
 #### With Package Control
-If you have [Package Control][http://github.com/wbond/sublime_package_control] installed, you can install SublimeCSSTidy from within Sublime Text 2. Open the Command Palette and enter "Package Control: Install Package", then search for *CSSTidy*.
+If you have [Package Control](http://github.com/wbond/sublime_package_control) installed, you can install SublimeCSSTidy from within Sublime Text 2. Open the Command Palette and enter "Package Control: Install Package", then search for *CSSTidy*.
 
 #### Without Package Control
 Clone the repository into your Sublime Text 2 packages directory:
@@ -29,4 +29,4 @@ Clone the repository into your Sublime Text 2 packages directory:
 [Go to the download section](http://github.com/fitnr/SublimeCSSTidy/downloads) and download the package. Unzip it, rename the folder *CSSTidy* and move it into your Sublime Text 2 packages directory (*Preferences > Browse Packages* in the menu)
 
 ### Problems?
-(Submit an issue)[https://github.com/fitnr/SublimeCSSTidy/issues] or tweet at [@fitnr](http://twitter.com/fitnr).
+[Submit an issue](https://github.com/fitnr/SublimeCSSTidy/issues).

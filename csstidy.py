@@ -101,7 +101,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
         # Fetch arguments from prefs files.
         csstidy_args = self.get_args(args, using_php)
 
-        if sublime.platform() == 'windows':
+        if sublime.platform() == 'windows' and using_php is True:
             shell = True
         else:
             shell = False

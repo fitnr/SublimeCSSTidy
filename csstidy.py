@@ -132,7 +132,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
     def get_args(self, passed_args, using_php):
         '''Build command line arguments.'''
 
-        settings = sublime.load_settings('csstidy.sublime-settings')
+        settings = sublime.load_settings('CSSTidy.sublime-settings')
         csstidy_args = []
 
         # Start off with a dash, the flag for using STDIN

@@ -30,6 +30,12 @@ packagepath = normpath(join(sublime.packages_path(), 'CSSTidy'))
 csstidypath = normpath(join(packagepath, 'win', 'csstidy.exe'))
 scriptpath = normpath(join(packagepath, 'csstidy.php'))
 
+startupinfo = None
+if sublime.platform() == 'windows':
+    startupinfo = subprocess.STARTUPINFO()
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    startupinfo.wShowWindow = subprocess.SW_HIDE
+
 ### FUNCTIONS ###
 
 
@@ -43,6 +49,7 @@ def tidy_string(input_css, script, args, shell):
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         universal_newlines=True,
+        startupinfo=startupinfo,
         shell=shell
         )
 
@@ -54,8 +61,8 @@ def find_tidier():
     ' Try php, then bundled tidy (if windows)'
 
     try:
-        subprocess.call(['php', '-v'])
-        #print "CSSTidy: Using PHP CSSTidy module."
+        subprocess.call(['php', '-v'], startupinfo=startupinfo)
+        # print "CSSTidy: Using PHP CSSTidy module."
         return 'php', True
     except OSError:
         print "CSSTidy: PHP not found. Is it installed and in your PATH?"
@@ -63,7 +70,7 @@ def find_tidier():
 
     if sublime.platform() == 'windows':
         try:
-            subprocess.call([csstidypath, "-v"], shell=True)
+            subprocess.call([csstidypath, "-v"], startupinfo=startupinfo, shell=True)
             print "CSSTidy: using csstidy.exe"
             return csstidypath, False
         except OSError:

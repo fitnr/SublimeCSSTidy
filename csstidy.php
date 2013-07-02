@@ -5,10 +5,10 @@ include 'csstidyphp/class.csstidy.php' ;
 
 // Get arguments. Dummy for short options
 $long_options = array(
-  "allow_html_in_templates::",
   "compress_colors::",
-  "compress_font::",
+  "compress_font-weight::",
   "discard_invalid_properties::",
+  "discard_invalid_selectors::",
   "lowercase_s::",
   "preserve_css::",
   "remove_bslash::",

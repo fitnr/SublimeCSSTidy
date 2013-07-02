@@ -9,15 +9,14 @@ import sublime_plugin
 ### CONSTANTS ###
 
 supported_options = [
-    "allow_html_in_templates",
     "compress_colors",
-    "compress_font"
+    "compress_font-weight",
     "discard_invalid_properties",
+    "discard_invalid_selectors",
     "lowercase_s",
     "preserve_css",
     "remove_bslash",
     "remove_last_;",
-    "silent",
     "sort_properties",
     "sort_selectors",
     "timestamp",
@@ -139,9 +138,11 @@ class CssTidyCommand(sublime_plugin.TextCommand):
     def get_args(self, passed_args, using_php):
         '''Build command line arguments.'''
 
-        settings = sublime.load_settings('CSSTidy.sublime-settings')
-        csstidy_args = []
+        self.settings = sublime.load_settings('CSSTidy.sublime-settings')
 
+        print 'get', self.settings.get("preserve_css")
+        csstidy_args = []
+        settings = self.settings
         # Start off with a dash, the flag for using STDIN
         if using_php:
             csstidy_args.extend(['-f', normpath(scriptpath), '--'])

@@ -20,11 +20,11 @@
   // true or false
   //"compress_font-weight": true,
 
-  // true or false
-  //"allow_html_in_templates": true,
+  // false or true
+  // "discard_invalid_properties": false,
 
   // false or true
-  //"silent": false,
+  // "discard_invalid_selectors": false,
 
   //"0", "1", "2"
   //"case_properties": "0",
@@ -49,6 +49,5 @@
 
   // "2", "1", "0"
   "merge_selectors": "0"
-
 
 }

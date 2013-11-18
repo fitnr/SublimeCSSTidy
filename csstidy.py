@@ -40,7 +40,7 @@ if sublime.platform() == 'windows':
 
 def tidy_string(input_css, script, args, shell):
     command = [script] + args
-    print "CSSTidy: Sending command: {0}".format(" ".join(command))
+    print("CSSTidy: Sending command:", " ".join(command))
 
     p = subprocess.Popen(
         command,
@@ -61,19 +61,19 @@ def find_tidier():
 
     try:
         subprocess.call(['php', '-v'], startupinfo=startupinfo)
-        # print "CSSTidy: Using PHP CSSTidy module."
+        # print("CSSTidy: Using PHP CSSTidy module.")
         return 'php', True
     except OSError:
-        print "CSSTidy: PHP not found. Is it installed and in your PATH?"
+        print("CSSTidy: PHP not found. Is it installed and in your PATH?")
         pass
 
     if sublime.platform() == 'windows':
         try:
             subprocess.call([csstidypath, "-v"], startupinfo=startupinfo, shell=True)
-            print "CSSTidy: using csstidy.exe"
+            print("CSSTidy: using csstidy.exe")
             return csstidypath, False
         except OSError:
-            print "CSSTidy: Didn't find tidy.exe in " + packagepath
+            print("CSSTidy: Didn't find tidy.exe in " + packagepath)
             pass
 
     raise OSError
@@ -84,12 +84,12 @@ def find_tidier():
 class CssTidyCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
         # Get current selection(s).
-        print 'CSSTidy: tidying {0} with args: {1}'.format(self.view.file_name(), args)
+        print('CSSTidy: tidying {0} with args: {1}'.format(self.view.file_name(), args))
 
         try:
             csstidy, using_php = find_tidier()
         except OSError:
-            print "CSSTidy: Couldn't find csstidy.exe or PHP. Stopping without Tidying anything."
+            print("CSSTidy: Couldn't find csstidy.exe or PHP. Stopping without Tidying anything.")
             return
 
         if self.view.sel()[0].empty():
@@ -114,13 +114,13 @@ class CssTidyCommand(sublime_plugin.TextCommand):
 
         # Tidy each selection.
         for sel in self.view.sel():
-            #print 'CSSTIdy: Sending this to Tidy:\n', self.view.substr(sel)
+            #print('CSSTIdy: Sending this to Tidy:\n', self.view.substr(sel))
             tidied, err, retval = tidy_string(self.view.substr(sel), csstidy, csstidy_args, shell)
-            #print 'CSSTIdy: Got these tidied styles back:\n', tidied
+            #print('CSSTIdy: Got these tidied styles back:\n', tidied)
 
             if err or retval != 0:
-                print 'CSSTidy returned {0}'.format(retval)
-                print "CSSTidy experienced an error. Opening up a new window to show you more."
+                print('CSSTidy returned {0}'.format(retval))
+                print("CSSTidy experienced an error. Opening up a new window to show you more.")
                 # Again, adapted from the Sublime Text 1 webdevelopment package
                 nv = self.view.window().new_file()
                 nv.set_scratch(1)
@@ -140,7 +140,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
 
         self.settings = sublime.load_settings('CSSTidy.sublime-settings')
 
-        print 'get', self.settings.get("preserve_css")
+        print('get', self.settings.get("preserve_css"))
         csstidy_args = []
         settings = self.settings
         # Start off with a dash, the flag for using STDIN

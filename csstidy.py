@@ -123,7 +123,6 @@ class CssTidyCommand(sublime_plugin.TextCommand):
                 print("CSSTidy experienced an error. Opening up a new window to show you more.")
                 # Again, adapted from the Sublime Text 1 webdevelopment package
                 nv = self.view.window().new_file()
-                nv.set_scratch(1)
                 # Append the given command to the error message.
                 command = csstidy + " " + " ".join(x for x in csstidy_args)
                 nv.insert(edit, 0, err + "\nCommand sent to Tidy:\n" + command)

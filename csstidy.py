@@ -7,7 +7,6 @@ import sublime
 import sublime_plugin
 
 ### CONSTANTS ###
-
 supported_options = [
     "compress_colors",
     "compress_font-weight",
@@ -25,69 +24,26 @@ supported_options = [
     "optimise_shorthands",
     "template"
 ]
-packagepath = normpath(join(sublime.packages_path(), 'CSSTidy'))
-csstidypath = normpath(join(packagepath, 'win', 'csstidy.exe'))
-scriptpath = normpath(join(packagepath, 'csstidy.php'))
-
-startupinfo = None
-if sublime.platform() == 'windows':
-    startupinfo = subprocess.STARTUPINFO()
-    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-    startupinfo.wShowWindow = subprocess.SW_HIDE
-
-### FUNCTIONS ###
-
-
-def tidy_string(input_css, script, args, shell):
-    command = [script] + args
-    print("CSSTidy: Sending command:", " ".join(command))
-
-    p = subprocess.Popen(
-        command,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        universal_newlines=True,
-        startupinfo=startupinfo,
-        shell=shell
-        )
-
-    tidied, err = p.communicate(input_css)
-    return tidied, err, p.returncode
-
-
-def find_tidier():
-    ' Try php, then bundled tidy (if windows)'
-
-    try:
-        subprocess.call(['php', '-v'], startupinfo=startupinfo)
-        # print("CSSTidy: Using PHP CSSTidy module.")
-        return 'php', True
-    except OSError:
-        print("CSSTidy: PHP not found. Is it installed and in your PATH?")
-        pass
-
-    if sublime.platform() == 'windows':
-        try:
-            subprocess.call([csstidypath, "-v"], startupinfo=startupinfo, shell=True)
-            print("CSSTidy: using csstidy.exe")
-            return csstidypath, False
-        except OSError:
-            print("CSSTidy: Didn't find tidy.exe in " + packagepath)
-            pass
-
-    raise OSError
 
 ### COMMAND ##
-
-
 class CssTidyCommand(sublime_plugin.TextCommand):
+
     def run(self, edit, **args):
         # Get current selection(s).
         print('CSSTidy: tidying {0} with args: {1}'.format(self.view.file_name(), args))
 
+        self.packagepath = normpath(join(sublime.packages_path(), 'CSSTidy'))
+        self.scriptpath = normpath(join(self.packagepath, 'csstidy.php'))
+        self.startupinfo = None
+
+        if sublime.platform() == 'windows':
+            self.scriptpath = normpath(join(self.packagepath, 'win', 'csstidy.exe'))
+            self.startupinfo = subprocess.STARTUPINFO()
+            self.startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            self.startupinfo.wShowWindow = subprocess.SW_HIDE
+
         try:
-            csstidy, using_php = find_tidier()
+            executable = self.find_tidier()
         except OSError:
             print("CSSTidy: Couldn't find csstidy.exe or PHP. Stopping without Tidying anything.")
             return
@@ -105,27 +61,25 @@ class CssTidyCommand(sublime_plugin.TextCommand):
             """
 
         # Fetch arguments from prefs files.
-        csstidy_args = self.get_args(args, using_php)
+        args = self.get_args(args, executable)
 
-        if sublime.platform() == 'windows' and using_php is True:
-            shell = True
-        else:
-            shell = False
+        shell = self.set_shell()
 
         # Tidy each selection.
         for sel in self.view.sel():
             #print('CSSTIdy: Sending this to Tidy:\n', self.view.substr(sel))
-            tidied, err, retval = tidy_string(self.view.substr(sel), csstidy, csstidy_args, shell)
+            tidied, err, retval = self.tidy_string(self.view.substr(sel), args, shell)
             #print('CSSTIdy: Got these tidied styles back:\n', tidied)
 
             if err or retval != 0:
                 print('CSSTidy returned {0}'.format(retval))
                 print("CSSTidy experienced an error. Opening up a new window to show you more.")
+
                 # Again, adapted from the Sublime Text 1 webdevelopment package
                 nv = self.view.window().new_file()
+
                 # Append the given command to the error message.
-                command = csstidy + " " + " ".join(x for x in csstidy_args)
-                nv.insert(edit, 0, err + "\nCommand sent to Tidy:\n" + command)
+                nv.insert(edit, 0, err + "\nCommand sent to Tidy:\n" + " ".join(x for x in args))
                 nv.set_name('CSSTidy Errors')
 
             else:
@@ -134,19 +88,63 @@ class CssTidyCommand(sublime_plugin.TextCommand):
                 self.view.replace(edit, sel, tidied + "\n")
                 return
 
-    def get_args(self, passed_args, using_php):
+    def set_shell(self):
+        if sublime.platform() == 'windows' and self.executable == 'php':
+            return True
+        return False
+
+    def tidy_string(self, input_css, args, shell):
+        print("CSSTidy: Sending command:" + " ".join(args))
+
+        p = subprocess.Popen(
+            args,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+            startupinfo=self.startupinfo,
+            shell=shell
+            )
+
+        tidied, err = p.communicate(input_css)
+        return tidied, err, p.returncode
+
+    def find_tidier(self):
+        ' Try php, then bundled tidy (if windows)'
+
+        try:
+            subprocess.call(['php', '-v'], startupinfo=self.startupinfo)
+            # print("CSSTidy: Using PHP CSSTidy module.")
+            return 'php'
+        except OSError:
+            print("CSSTidy: PHP not found. Is it installed and in your PATH?")
+            pass
+
+        if sublime.platform() == 'windows':
+            try:
+                subprocess.call([self.scriptpath, "-v"], startupinfo=self.startupinfo, shell=True)
+                print("CSSTidy: using csstidy.exe")
+                return self.scriptpath
+            except OSError:
+                print("CSSTidy: Didn't find tidy.exe in " + self.packagepath)
+                pass
+
+        raise OSError
+
+    def get_args(self, passed_args, executable):
         '''Build command line arguments.'''
 
-        self.settings = sublime.load_settings('CSSTidy.sublime-settings')
+        settings = sublime.load_settings('CSSTidy.sublime-settings')
+        csstidy_args = [executable]
 
-        print('get', self.settings.get("preserve_css"))
-        csstidy_args = []
-        settings = self.settings
+        # print('CSSTidy: preserve css get:', settings.get("preserve_css"))
+
         # Start off with a dash, the flag for using STDIN
-        if using_php:
-            csstidy_args.extend(['-f', normpath(scriptpath), '--'])
+        # Set out file for csstidy.exe. PHP uses STDOUT
+        if executable == 'php':
+            csstidy_args.extend(['-f', normpath(self.scriptpath), '--'])
         else:
-            csstidy_args.append('-')
+            csstidy_args.append(['-', '--silent=1'])
 
         for option in supported_options:
             # If custom value isn't set, ignore that setting.
@@ -170,9 +168,5 @@ class CssTidyCommand(sublime_plugin.TextCommand):
         # Optionally replace tabs with spaces.
         if self.view.settings().get('translate_tabs_to_spaces'):
             self.space_tab = " " * int(self.view.settings().get('tab_size', 4))
-
-        # Set out file for csstidy.exe. PHP using stream.
-        if not using_php:
-            csstidy_args.append('--silent=1')
 
         return csstidy_args

@@ -19,7 +19,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU Lesser General Public License for more details.
- * 
+ *
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -42,23 +42,29 @@
 class csstidy_print {
 
 	/**
+	 * csstidy object
+	 * @var object
+	 */
+	public $parser;
+
+	/**
 	 * Saves the input CSS string
 	 * @var string
 	 * @access private
 	 */
-	var $input_css = '';
+	public $input_css = '';
 	/**
 	 * Saves the formatted CSS string
 	 * @var string
 	 * @access public
 	 */
-	var $output_css = '';
+	public $output_css = '';
 	/**
 	 * Saves the formatted CSS string (plain text)
 	 * @var string
 	 * @access public
 	 */
-	var $output_css_plain = '';
+	public $output_css_plain = '';
 
 	/**
 	 * Constructor
@@ -66,8 +72,8 @@ class csstidy_print {
 	 * @access private
 	 * @version 1.0
 	 */
-	function csstidy_print(&$css) {
-		$this->parser = & $css;
+	public function __construct($css) {
+		$this->parser = $css;
 		$this->css = & $css->css;
 		$this->template = & $css->template;
 		$this->tokens = & $css->tokens;
@@ -81,7 +87,7 @@ class csstidy_print {
 	 * @access private
 	 * @version 1.0
 	 */
-	function _reset() {
+	public function _reset() {
 		$this->output_css = '';
 		$this->output_css_plain = '';
 	}
@@ -93,7 +99,7 @@ class csstidy_print {
 	 * @access public
 	 * @version 1.0
 	 */
-	function plain($default_media='') {
+	public function plain($default_media='') {
 		$this->_print(true, $default_media);
 		return $this->output_css_plain;
 	}
@@ -105,7 +111,7 @@ class csstidy_print {
 	 * @access public
 	 * @version 1.0
 	 */
-	function formatted($default_media='') {
+	public function formatted($default_media='') {
 		$this->_print(false, $default_media);
 		return $this->output_css;
 	}
@@ -120,9 +126,12 @@ class csstidy_print {
 	 * @access public
 	 * @version 1.4
 	 */
-	function formatted_page($doctype='xhtml1.1', $externalcss=true, $title='', $lang='en') {
+	public function formatted_page($doctype='html5', $externalcss=true, $title='', $lang='en') {
 		switch ($doctype) {
-			case 'xhtml1.0strict':
+			case 'html5':
+				$doctype_output = '<!DOCTYPE html>';
+				break;
+				case 'xhtml1.0strict':
 				$doctype_output = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 			"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
 				break;
@@ -147,7 +156,6 @@ class csstidy_print {
 			$output .= "\n</style>";
 		} else {
 			$output .= "\n" . '    <link rel="stylesheet" type="text/css" href="cssparsed.css" />';
-//			}
 		}
 		$output .= "\n</head>\n<body><code id=\"copytext\">";
 		$output .= $this->formatted();
@@ -162,7 +170,7 @@ class csstidy_print {
 	 * @access private
 	 * @version 2.0
 	 */
-	function _print($plain = false, $default_media='') {
+	public function _print($plain = false, $default_media='') {
 		if ($this->output_css && $this->output_css_plain) {
 			return;
 		}
@@ -278,7 +286,7 @@ class csstidy_print {
 	 * @access private
 	 * @version 1.0
 	 */
-	function _seeknocomment($key, $move) {
+	public function _seeknocomment($key, $move) {
 		$go = ($move > 0) ? 1 : -1;
 		for ($i = $key + 1; abs($key - $i) - 1 < abs($move); $i += $go) {
 			if (!isset($this->tokens[$i])) {
@@ -298,7 +306,7 @@ class csstidy_print {
 	 * @access private
 	 * @version 1.0
 	 */
-	function _convert_raw_css($default_media='') {
+	public function _convert_raw_css($default_media='') {
 		$this->tokens = array();
 		$sort_selectors = $this->parser->get_cfg('sort_selectors');
 		$sort_properties = $this->parser->get_cfg('sort_properties');
@@ -308,14 +316,13 @@ class csstidy_print {
 				ksort($val);
 			if (intval($medium) < DEFAULT_AT) {
 				// un medium vide (contenant @font-face ou autre @) ne produit aucun conteneur
-				if (strlen(trim($medium))){
+				if (strlen(trim($medium))) {
 					$this->parser->_add_token(AT_START, $medium, true);
 				}
-			}
-			elseif ($default_media) {
+			} elseif ($default_media) {
 				$this->parser->_add_token(AT_START, $default_media, true);
 			}
-			
+
 			foreach ($val as $selector => $vali) {
 				if ($sort_properties)
 					ksort($vali);
@@ -328,7 +335,7 @@ class csstidy_print {
 					'-' => array()  // IE6 hacks
 				);
 				foreach ($vali as $property => $valj) {
-					if (strncmp($property,"//",2)!==0){
+					if (strncmp($property,"//",2)!==0) {
 						$matches = array();
 						if ($sort_properties && preg_match('/^(\*|_|\/|-)(?!(ms|moz|o\b|xv|atsc|wap|khtml|webkit|ah|hp|ro|rim|tc)-)/', $property, $matches)) {
 							$invalid[$matches[1]][$property] = $valj;
@@ -349,11 +356,10 @@ class csstidy_print {
 
 			if (intval($medium) < DEFAULT_AT) {
 				// un medium vide (contenant @font-face ou autre @) ne produit aucun conteneur
-				if (strlen(trim($medium))){
+				if (strlen(trim($medium))) {
 					$this->parser->_add_token(AT_END, $medium, true);
 				}
-			}
-			elseif ($default_media) {
+			} elseif ($default_media) {
 				$this->parser->_add_token(AT_END, $default_media, true);
 			}
 		}
@@ -368,7 +374,7 @@ class csstidy_print {
 	 * @access private
 	 * @version 1.0
 	 */
-	function _htmlsp($string, $plain) {
+	public function _htmlsp($string, $plain) {
 		if (!$plain) {
 			return htmlspecialchars($string, ENT_QUOTES, 'utf-8');
 		}
@@ -381,7 +387,7 @@ class csstidy_print {
 	 * @return float
 	 * @version 1.2
 	 */
-	function get_ratio() {
+	public function get_ratio() {
 		if (!$this->output_css_plain) {
 			$this->formatted();
 		}
@@ -394,7 +400,7 @@ class csstidy_print {
 	 * @return string
 	 * @version 1.1
 	 */
-	function get_diff() {
+	public function get_diff() {
 		if (!$this->output_css_plain) {
 			$this->formatted();
 		}
@@ -417,7 +423,7 @@ class csstidy_print {
 	 * @return integer
 	 * @version 1.0
 	 */
-	function size($loc = 'output') {
+	public function size($loc = 'output') {
 		if ($loc === 'output' && !$this->output_css) {
 			$this->formatted();
 		}

@@ -16,26 +16,24 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU Lesser General Public License for more details.
- * 
+ *
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @license http://opensource.org/licenses/lgpl-license.php GNU Lesser General Public License
  * @package csstidy
  * @author Florian Schmitz (floele at gmail dot com) 2005-2007
-  * @author Brett Zamir (brettz9 at yahoo dot com) 2007
+ * @author Brett Zamir (brettz9 at yahoo dot com) 2007
  */
 
 
-if(isset($_GET['lang'])) {
-    $l = $_GET['lang'];
-}
-else if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-    $l = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
-    $l = strtolower(substr($l, 0, 2));
-}
-else {
-    $l = '';
+if (isset($_GET['lang'])) {
+	$l = $_GET['lang'];
+} elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+	$l = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+	$l = strtolower(substr($l, 0, 2));
+} else {
+	$l = '';
 }
 
 $l = (in_array($l, array('de', 'fr', 'zh'))) ? $l : 'en';
@@ -128,7 +126,7 @@ $lang['de'][15] = 'Standard (Kompromiss zwischen Lesbarkeit und Größe)';
 $lang['de'][16] = 'Niedrig (höhere Lesbarkeit)';
 $lang['de'][17] = 'Benutzerdefiniert (unten eingeben)';
 $lang['de'][18] = 'Benutzerdefinierte <a href="http://csstidy.sourceforge.net/templates.php">Vorlage</a>';
-$lang['de'][19] = 'Optionen';   
+$lang['de'][19] = 'Optionen';
 $lang['de'][20] = 'Selektoren sortieren (Vorsicht)';
 $lang['de'][21] = 'Eigenschaften sortieren';
 $lang['de'][22] = 'Selektoren umgruppieren';
@@ -140,7 +138,7 @@ $lang['de'][27] = 'Kleinbuchstaben';
 $lang['de'][28] = 'Keine oder ungültige CSS Eingabe oder falsche URL!';
 $lang['de'][29] = 'Großbuchstaben';
 $lang['de'][30] = 'kleingeschriebene Elementnamen benötigt für XHTML';
-$lang['de'][31] = 'Unnötige Backslashes entfernen'; 
+$lang['de'][31] = 'Unnötige Backslashes entfernen';
 $lang['de'][32] = '!important-Hack konvertieren';
 $lang['de'][33] = 'Als Datei ausgeben';
 $lang['de'][34] = 'Größere Komprimierung augrund von kleineren Neuezeile-Zeichen';
@@ -177,8 +175,8 @@ $lang['de'][65] = 'CSS to style CSS output';
 $lang['de'][66] = 'You need to go to about:config in your URL bar, select \'signed.applets.codebase_principal_support\' in the filter field, and set its value to true in order to use this feature; however, be aware that doing so increases security risks.';
 
 
-$lang['fr'][0] = 'CSS Formatteur et Optimiseur (basé sur CSSTidy ';
-$lang['fr'][1] = 'CSS Formatteur et Optimiseur';
+$lang['fr'][0] = 'CSS Formateur et Optimiseur (basé sur CSSTidy ';
+$lang['fr'][1] = 'CSS Formateur et Optimiseur';
 $lang['fr'][2] = '(basé sur ';
 $lang['fr'][3] = '(Version texte)';
 $lang['fr'][4] = 'Note Importante&#160;:';
@@ -235,13 +233,13 @@ $lang['fr'][56] = 'Toutes les optimisations';
 $lang['fr'][57] = 'Ajouter un timestamp';
 $lang['fr'][58] = 'Copier dans le presse-papiers';
 $lang['fr'][59] = 'Retour en haut';
-$lang['fr'][60] = 'Votre navigateur ne suporte pas la copie vers le presse-papiers.';
+$lang['fr'][60] = 'Votre navigateur ne supporte pas la copie vers le presse-papiers.';
 $lang['fr'][61] = 'Pour signaler des bugs ou pour des suggestions,';
 $lang['fr'][62] = 'contactez-moi';
 $lang['fr'][63] = 'Sauver le code CSS comme document complet HTML';
 $lang['fr'][64] = 'Code';
 $lang['fr'][65] = 'CSS pour colorier la sortie CSS';
-$lang['fr'][66] = 'Vous devez aller dans about:config dans votre barre d’adresse, selectionner \'signed.applets.codebase_principal_support\' dans le champ Filtre et attribuez-lui la valeur \'true\' pour utiliser cette fonctionnalité; toutefois, soyez conscient que cela augmente les risques de sécurité.';
+$lang['fr'][66] = 'Vous devez aller dans about:config dans votre barre d’adresse, sélectionner \'signed.applets.codebase_principal_support\' dans le champ Filtre et attribuez-lui la valeur \'true\' pour utiliser cette fonctionnalité; toutefois, soyez conscient que cela augmente les risques de sécurité.';
 
 
 $lang['zh'][0] = 'CSS整形與最佳化工具(使用 CSSTidy ';
@@ -271,7 +269,7 @@ $lang['zh'][24] = '壓縮色彩語法';
 $lang['zh'][25] = '改用小寫選擇符';
 $lang['zh'][26] = '屬性的字形:';
 $lang['zh'][27] = '小寫';
-$lang['zh'][28] = '沒有輸入CSS, 語法不符合規定, 或是網址錯誤!'; 
+$lang['zh'][28] = '沒有輸入CSS, 語法不符合規定, 或是網址錯誤!';
 $lang['zh'][29] = '大寫';
 $lang['zh'][30] = 'XHTML必須使用小寫的元素名稱';
 $lang['zh'][31] = '移除不必要的反斜線';

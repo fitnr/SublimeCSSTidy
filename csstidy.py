@@ -140,6 +140,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
         '''Build command line arguments.'''
 
         settings = sublime.load_settings('CSSTidy.sublime-settings')
+        
         csstidy_args = [executable]
 
         # print('CSSTidy: preserve css get:', settings.get("preserve_css"))
@@ -153,11 +154,15 @@ class CssTidyCommand(sublime_plugin.TextCommand):
 
         for option in supported_options:
             # If custom value isn't set, ignore that setting.
-            if settings.get(option) is None and passed_args.get(option) is None:
+            if not settings.has(option) and passed_args.get(option) is None:
                 continue
 
             # The passed arguments override options in the settings file.
-            value = passed_args.get(option) if passed_args.get(option) is not None else settings.get(option)
+            if passed_args.get(option) is not None:
+                value = passed_args.get(option)
+
+            if settings.has(option):
+                value = passed_args.get(option)
 
             # For some reason, csstidy.exe acts up less when passed numerals rather than booleans.
             if value in [True, 'true', 'True', 1]:

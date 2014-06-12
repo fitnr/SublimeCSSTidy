@@ -103,7 +103,6 @@ class CssTidyCommand(sublime_plugin.TextCommand):
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=True,
             startupinfo=self.startupinfo,
             shell=shell
             )

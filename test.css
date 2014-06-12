@@ -1,0 +1,6 @@
+@media all and (min-width: 479px) {
+  .nav-list-sub li:before
+  {
+    content:"· "
+  }
+}

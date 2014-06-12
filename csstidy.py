@@ -107,8 +107,9 @@ class CssTidyCommand(sublime_plugin.TextCommand):
             shell=shell
             )
 
-        tidied, err = p.communicate(input_css)
-        return tidied, err, p.returncode
+        # Encode to send to pipe, decode what's recieved from pipe
+        tidied, err = p.communicate(input_css.encode('utf-8'))
+        return tidied.decode('utf-8'), err, p.returncode
 
     def find_tidier(self):
         ' Try php, then bundled tidy (if windows)'

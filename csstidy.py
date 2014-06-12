@@ -140,7 +140,6 @@ class CssTidyCommand(sublime_plugin.TextCommand):
         '''Build command line arguments.'''
 
         settings = sublime.load_settings('CSSTidy.sublime-settings')
-        
         csstidy_args = [executable]
 
         # print('CSSTidy: preserve css get:', settings.get("preserve_css"))

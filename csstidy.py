@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 #coding: utf8
 # adapted from csstidy.py in the Sublime Text 1 webdevelopment package
-from os.path import join, normpath
+from os.path import join
 import subprocess
 import sublime
 import sublime_plugin
+
 
 ### CONSTANTS ###
 supported_options = [
@@ -94,7 +95,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
             return True
         return False
 
-    def tidy_string(self, input_css, args, shell):
+    def tidy_string(self, css, args, shell):
         print("CSSTidy: Sending command:" + " ".join(args))
 
         p = subprocess.Popen(
@@ -107,7 +108,10 @@ class CssTidyCommand(sublime_plugin.TextCommand):
             shell=shell
             )
 
-        tidied, err = p.communicate(input_css)
+        # Encode to send to pipe, decode what's recieved from pipe
+        tidied, err = p.communicate(css.encode('utf-8', 'backslashreplace'))
+        tidied = tidied.decode('utf-8')
+
         return tidied, err, p.returncode
 
     def find_tidier(self):

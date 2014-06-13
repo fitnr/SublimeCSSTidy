@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding: utf8
 # adapted from csstidy.py in the Sublime Text 1 webdevelopment package
-from os.path import join
+from os.path import join, exists
 import subprocess
 import sublime
 import sublime_plugin
@@ -53,14 +53,6 @@ class CssTidyCommand(sublime_plugin.TextCommand):
         if self.view.sel()[0].empty():
             # If no selection, get the entire view.
             self.view.sel().add(sublime.Region(0, self.view.size()))
-
-            """
-            # If selection, then make sure not to add body tags and the like.
-            # Not sure how to bring this into st2, or if it ever worked.
-
-            if self.view.match_selector(0, 'source.css.embedded.html'):
-                self.view.run_command('select_inside_tag')
-            """
 
         # Fetch arguments from prefs files.
         args = self.get_args(args, executable)
@@ -139,7 +131,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
     def get_args(self, passed_args, executable):
         '''Build command line arguments.'''
 
-        settings = sublime.load_settings('CSSTidy.sublime-settings')
+        settings = sublime.load_settings('csstidy.sublime-settings')
         csstidy_args = [executable]
 
         # print('CSSTidy: preserve css get:', settings.get("preserve_css"))
@@ -157,20 +149,25 @@ class CssTidyCommand(sublime_plugin.TextCommand):
                 continue
 
             # The passed arguments override options in the settings file.
-            if passed_args.get(option) is not None:
-                value = passed_args.get(option)
-
             if settings.has(option):
+                value = settings.get(option)
+
+            if passed_args.get(option) is not None:
                 value = passed_args.get(option)
 
             # For some reason, csstidy.exe acts up less when passed numerals rather than booleans.
             if value in [True, 'true', 'True', 1]:
                 value = '1'
-            if value in [False, 'false', 'False', 0]:
+            elif value in [False, 'false', 'False', 0]:
                 value = '0'
 
             if 'template' == option and value not in ['default', 'low', 'high', 'highest']:
-                value = join(sublime.packages_path(), 'User', value)
+                template_path = join(sublime.packages_path(), 'User', value)
+                if exists(template_path):
+                    value = template_path
+                else:
+                    print("CSSTidy: Couldn't find the template", "'" + value + "'")
+                    continue
 
             csstidy_args.append("--{0}={1}".format(option, value))
 

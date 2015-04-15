@@ -81,7 +81,7 @@ class CssTidyCommand(sublime_plugin.TextCommand):
                 nv = self.view.window().new_file()
 
                 # Append the given command to the error message.
-                nv.insert(edit, 0, err + "\nCommand sent to Tidy:\n" + " ".join(x for x in args))
+                nv.insert(edit, 0, "{}\nCommand sent to Tidy:\n".format(err) + " ".join(x for x in args))
                 nv.set_name('CSSTidy Errors')
 
             else:
